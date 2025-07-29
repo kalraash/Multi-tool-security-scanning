@@ -1,0 +1,103 @@
+Option 1: Scanning with the Web Version of Snyk
+This is useful for one-time or ad-hoc scans from the Snyk dashboard.
+
+Step 1: Sign Up and Log In
+Go to https://snyk.io.
+
+Sign up or log in using GitHub, GitLab, Bitbucket, or email.
+
+Step 2: Connect Your Git Repository
+Navigate to Projects > Add Project.
+
+Choose your Git provider (e.g., GitHub).
+
+Authorize Snyk to access your repositories.
+
+Step 3: Select Repositories to Scan
+Choose one or more repositories you want Snyk to monitor.
+
+Snyk will automatically detect manifest files such as:
+
+package.json, requirements.txt, pom.xml, etc.
+
+IaC files like Dockerfile, terraform.tf, kubernetes.yaml
+
+Step 4: Scan the Project
+Click on the repository name from the project list.
+
+Snyk will display issues under:
+
+Open Source vulnerabilities
+
+Code (SAST) issues
+
+IaC misconfigurations
+
+Step 5: Monitor and Fix
+View CVEs, severity, and remediation advice.
+
+Use Ignore, Fix PR, or Upgrade options.
+
+Snyk will continuously monitor the repo and alert you of new vulnerabilities.
+
+
+Option 2: Scanning with Snyk GitHub Actions (CI/CD Workflow)
+This is ideal for automated security scanning on every push or PR.
+
+Step 1: Create a Snyk API Token
+Log into Snyk and go to Account Settings > API Token.
+
+Copy the token.
+
+Step 2: Add the API Token to GitHub Secrets
+Go to your GitHub repo > Settings > Secrets and variables > Actions.
+
+Add a new secret:
+
+Name: SNYK_TOKEN
+
+Value: Your copied token
+
+Step 3: Add Snyk GitHub Action Workflow
+Create a file: .github/workflows/snyk.yml
+
+Use the following code in the workflow:
+
+name: Snyk Security Scan
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  snyk:
+    name: Run Snyk to check for vulnerabilities
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js (optional, adjust for your environment)
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Run Snyk to check vulnerabilities
+        uses: snyk/actions/node@v1
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          command: test
+
+Step 4: Commit & Push
+Commit and push the workflow file.
+
+The scan will run on every push or pull request to main.
+
+Step 5: Review Results
+Go to Actions tab in GitHub to view the scan report.
+
+You’ll see a breakdown of vulnerabilities and suggestions to remediate.
