@@ -1,0 +1,71 @@
+Step 1: Prerequisites
+OWASP ZAP installed on your machine:
+Download: https://www.zaproxy.org/download/
+Desktop app with an exposed API or local web interface.
+Java installed (ZAP runs on Java).
+(Optional) Postman or cURL to replay API traffic.
+
+Step 2: Launch ZAP and Configure Proxy
+Start OWASP ZAP GUI.
+Go to:
+Tools > Options > Local Proxy
+Confirm default is set to:
+Address: 127.0.0.1
+Port: 8080
+Set your desktop app (or browser if it uses webview) to route all HTTP/S traffic through this proxy:
+For browsers: Set proxy manually to localhost:8080
+For API clients: Use http://127.0.0.1:8080 as proxy
+
+Step 3: Interact with Your Desktop App
+Run the app and perform typical user/API operations.
+ZAP will capture and record all requests and responses via its Sites tab.
+It builds a site tree of all endpoints discovered (GET, POST, etc.).
+
+Step 4: Explore the API (Optional)
+If your desktop app has a Swagger/OpenAPI spec or Postman collection:
+Option A: Import API Definition
+Go to Import > Import OpenAPI/Swagger or Import > Import Postman Collection.
+Provide the local or remote file/URL.
+ZAP will pre-populate the target API structure.
+Option B: Manual API Exploration
+Use API client (e.g., Postman/cURL) to hit endpoints while ZAP is proxying.
+ZAP will record all traffic in the History and Sites panel.
+
+Step 5: Configure Active Scan
+In ZAP, right-click the target domain or IP under the Sites tree.
+Choose Attack > Active Scan.
+Configure the scan:
+Target: The API base URL (e.g., http://localhost:3000)
+Select relevant scan policies:
+XSS
+SQLi
+Command Injection
+CSRF
+Server misconfigurations
+Click Start Scan.
+
+Step 6: Monitor Scan Progress and Results
+Active scanning may take a few minutes depending on API size.
+Results will populate in:
+Alerts Tab: Lists vulnerabilities found (with severity).
+History Tab: Shows all scanned requests/responses.
+Each alert includes:
+Vulnerability type
+Severity (High, Medium, Low)
+Affected URL
+Suggested remediation
+
+
+Step 7: Generate a Security Report
+Go to Report > Generate Report > Choose format: HTML, XML, Markdown.
+Reports include:
+Summary of vulnerabilities
+Request/response samples
+CWE references
+
+Optional: Automate with ZAP CLI or Docker (Headless Scan)
+For repeatable scans, you can run ZAP via CLI or Docker:
+Example CLI Command: zap.sh -cmd -quickurl http://localhost:3000 -quickout zap_report.html
+Docker Example: docker run -u zap -p 8080:8080 -i owasp/zap2docker-stable zap-baseline.py -t http://host.docker.internal:3000 -r zap_report.html
+
+
