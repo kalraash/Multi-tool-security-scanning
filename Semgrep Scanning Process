@@ -1,0 +1,106 @@
+Step 1. Create a Semgrep Account and Organization
+
+Go to https://semgrep.dev and sign up (you can use GitHub for quick registration).
+
+After login, create or join an organization within Semgrep to manage scans centrally.
+
+Step 2. Connect GitHub Repositories to Semgrep
+
+This enables Semgrep to monitor repositories and trigger scans from its dashboard.
+
+Steps:
+In Semgrep dashboard, go to Settings > Integrations > Code.
+
+Click Connect Repository or Connect GitHub Organization.
+
+Authorize Semgrep’s GitHub App to access your repositories:
+
+Choose either all repos or specific repos.
+
+Once connected, Semgrep will list all authorized repositories.
+
+Click Enable Scanning for each repository you want to scan.
+
+Step 3. Configure Semgrep Rules
+Semgrep can use:
+
+Built-in rules (e.g., OWASP Top 10, secrets, cloud misconfigurations).
+
+Community-written rulesets
+
+Custom rules (you can write YAML-based rules tailored to your code)
+
+You can manage rules in:
+
+https://semgrep.dev/r
+
+Or create rules in your own org under Rules > Create Rule
+
+Step 4. Run a Manual Scan from Semgrep UI (Optional)
+
+After integration, click on a connected repository.
+
+Click Scan Now to trigger a scan from the dashboard.
+
+Review findings under Findings tab—categorized by severity, rule, and file path.
+
+CI/CD Integration: Run Semgrep in GitHub Actions
+
+Step 5. Add GitHub Actions Workflow for Semgrep
+You can run Semgrep automatically during pull requests or pushes.
+
+Create: .github/workflows/semgrep.yml
+
+name: Semgrep Scan
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  semgrep:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python (required by Semgrep)
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install Semgrep
+        run: |
+          pip install semgrep
+
+      - name: Run Semgrep scan
+        run: |
+          semgrep --config auto
+
+Optional: Upload Results to Semgrep Cloud Platform
+To view results in the Semgrep dashboard (hosted service):
+
+Get your Semgrep App Token:
+
+Go to Settings > Organization > App Tokens
+
+Create and copy the token.
+
+Add token to GitHub:
+
+Go to GitHub Repo > Settings > Secrets > Actions
+
+Add:
+
+Name: SEMGREP_APP_TOKEN
+
+Value: your token
+
+Modify workflow to upload scan results:
+
+      - name: Run Semgrep with cloud upload
+        run: |
+          semgrep ci
+        env:
+          SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
