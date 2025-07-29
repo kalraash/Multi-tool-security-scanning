@@ -1,0 +1,60 @@
+Step 1: Prerequisites
+Your project should be hosted on GitHub.
+CodeQL supports several languages: JavaScript, Python, Java, Go, C/C++, C#, Ruby, TypeScript.
+Repository must have a GitHub Advanced Security license (for private repos) or be public.
+
+Step 2: Enable GitHub Code Scanning
+Go to your GitHub repository.
+Click on Security > Code scanning alerts.
+Click Set up code scanning > Choose "Set up this workflow" under CodeQL Analysis.
+
+Step 3: Customize CodeQL Workflow
+
+name: "CodeQL"
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '0 5 * * 1' # weekly scan every Monday
+
+jobs:
+  analyze:
+    name: Analyze code with CodeQL
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write  # Required to upload results
+
+    strategy:
+      matrix:
+        language: [ 'javascript', 'python' ] # Update based on your codebase
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: ${{ matrix.language }}
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+
+
+Step 4: 4. View Scan Results
+After a scan, results will appear under:
+GitHub > Security tab > Code scanning alerts
+Alerts include:
+CWE category
+Severity (Low, Medium, High)
+Path to vulnerable code
+Recommendations with links to the relevant part of the code
+
+Step 5: Ongoing Monitoring
+Use scheduled scans to catch issues that may arise from third-party updates.
+Enable PR scanning to block vulnerable code before merge.
+Integrate with tools like GitHub’s Dependabot to get a full picture of your software supply chain risks.
